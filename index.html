@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>incrustwerush.org</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="icon.ico" />
+    <style>
+        html {
+
+            background: url('bg.jpg') no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            background-color: black;
+            color: white;
+            font-family: monospace;
+
+        }
+
+        body {
+
+            margin: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+
+        }
+
+        .content {
+
+            margin: 20px;
+            padding: 15px;
+            border: 1px solid aqua;
+            border-radius: 10px;
+
+        }
+
+        hr {
+
+            margin-bottom: 20px;
+            border: 1px solid white;
+
+        }
+
+        a {
+
+            text-decoration: underline;
+            color: white;
+
+        }
+
+        a:hover {
+
+            text-decoration: underline;
+            color: aqua;
+
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div style="margin-bottom: 20px; text-align: center;">
+            <div style="margin-bottom: 10px; color: aqua;">
+                <span style="font-size: 30px;">incrustwerush.org</span>
+            </div>
+            <div>
+                Science, Social, Technology, and BrotherHood
+            </div>
+        </div>
+        <hr />
+        <div style="margin-bottom: 10px;">
+            <div style="margin-bottom: 10px; text-align: center; font-style: italic;">
+                <span style="color: aqua;">&quot;</span>
+                The declination of sanity in the semi-black age that comes with a desire for praxis, along with the darkness creeping softly.
+                Wielding a crowd of angry worshipers in the depths of the bottom of the trough of imagination. Half peaceful, half ironic, and half passionately dancing.
+                <span style="color: aqua;">&quot;</span>
+            </div>
+            <div style="text-align: center; font-style: italic; color: aqua;">
+                incrustwerush.org
+            </div>
+        </div>
+        <hr />
+        <div style="margin-bottom: 10px;">
+            <div style="margin-bottom: 10px; color: aqua; text-align: center;">
+                <b>About Us</b>
+            </div>
+            <div>
+                We are an organization that was founded on December 20, 2015. Not only Information Technology is the topic of our organization, but we also discuss everything about science, life, social, outlook on life and etc.
+            </div>
+        </div>
+        <hr />
+        <div style="margin-bottom: 10px;">
+            <div style="margin-bottom: 10px; color: aqua; text-align: center;">
+                <b>Join Us</b>
+            </div>
+            <div style="text-align: center;">
+                <ul>
+                    <li><a href="https://t.me/officialicwr">Telegram Group</a></li>
+                    <li><a href="https://t.me/icwrnews">Telegram News Channel</a></li>
+                    <li><a href="https://t.me/icwrinfo">Telegram Information Channel ( Technique )</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <div style="margin-bottom: 10px;">
+            <div style="text-align: center; color: aqua;">
+                <i>Copyright &copy;<span id="year"></span> R&D ICWR - All rights reserved.</i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const date = new Date();
+        let year = date.getFullYear();
+
+        document.getElementById("year").innerHTML = year;
+    </script>
+</body>
+</html>
