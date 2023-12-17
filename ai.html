@@ -43,20 +43,17 @@
 
                     // console.log(data.result);
                     document.getElementById("chat").value += "GPT : \n\n" + data.result + "\n\n";
-                    var textarea = document.getElementById('chat');
-                    textarea.scrollTop = textarea.scrollHeight;
 
                 })
                 .catch(error => {
 
                     document.getElementById("chat").value += "GPT : \n\nMaaf, terjadi kesalahan \n\n";
-                    var textarea = document.getElementById('chat');
-                    textarea.scrollTop = textarea.scrollHeight;
 
                 })
                 .finally(() => {
 
-                    //
+                    var textarea = document.getElementById('chat');
+                    textarea.scrollTop = textarea.scrollHeight;
 
                 });
 
