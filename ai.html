@@ -4,18 +4,30 @@
     <title>incrustwerush.org - ChatGPT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
-<body style="margin: 0 auto;">
-    <div style="margin: 20px; text-align: center;">
-        ChatGPT
-    </div>
-    <div style="margin: 20px;">
-        <textarea style="width: 100%; height: 200px;" id="chat"></textarea>
-    </div>
-    <div style="margin: 20px;">
-        <input style="width: 100%;" type="text" id="msg" />
-    </div>
-    <div style="margin: 20px;">
-        <button type="submit" style="background-color: white; border: 1px solid black; width: 100%;" onclick="chat();">Send Message!</button>
+<body style="margin: 0 auto; background-color: white; font-family: monospace;">
+    <div style="margin: 10px; border: 1px solid black;">
+        <div style="margin: 20px; text-align: center;">
+            <span style="font-weight: bold; font-size: 25px;">ChatGPT</span>
+        </div>
+        <div style="margin: 20px; border: 1px solid black;">
+            <div style="margin: 20px;">
+                Chat BOX
+            </div>
+            <div style="margin: 20px;">
+                <textarea style="width: 100%; height: 350px;" id="chat"></textarea>
+            </div>
+        </div>
+        <div style="margin: 20px; border: 1px solid black;">
+            <div style="margin: 20px;">
+                Message :
+            </div>
+            <div style="margin: 20px;">
+                <textarea style="width: 100%; height: 150px;" id="msg"></textarea>
+            </div>
+            <div style="margin: 20px;">
+                <button type="submit" style="background-color: white; border: 1px solid black; width: 100%;" onclick="chat();">Send Message!</button>
+            </div>
+        </div>
     </div>
     <script>
         function chat()
