@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>incrustwerush.org - ChatGPT</title>
+</head>
+<body style="margin: 0 auto;">
+    <div style="margin: 20px; text-align: center;">
+        ChatGPT
+    </div>
+    <div style="margin: 20px;">
+        <textarea style="width: 100%; height: 200px;" id="chat"></textarea>
+    </div>
+    <div style="margin: 20px;">
+        <input style="width: 100%;" type="text" id="msg" />
+    </div>
+    <div style="margin: 20px;">
+        <button type="submit" style="background-color: white; border: 1px solid black; width: 100%;" onclick="chat();">Send Message!</button>
+    </div>
+    <script>
+        function chat()
+        {
+
+            var msg = document.getElementById("msg").value;
+
+            if (msg != '') {
+
+                document.getElementById("msg").value = "";
+
+                document.getElementById("chat").value += "You : \n\n" + msg + "\n\n";
+
+                var url = "https://langapi.cyclic.app/api/openai?text=" + msg;
+
+                fetch(url)
+                .then(function (result)
+                {
+
+                    return result.json();
+
+                })
+                .then(function (data)
+                {
+
+                    // console.log(data.result);
+                    document.getElementById("chat").value += "GPT : \n\n" + data.result + "\n\n";
+
+                })
+                .catch(error => {
+
+                    document.getElementById("chat").value += "GPT : \n\nMaaf, terjadi kesalahan \n\n";
+
+                })
+                .finally(() => {
+
+                    //
+
+                });
+
+            } else {
+
+                document.getElementById("chat").value += "GPT : \n\nHarap isi pesan! \n\n";
+
+            }
+
+            var textarea = document.getElementById('chat');
+            textarea.scrollTop = textarea.scrollHeight;
+
+        }
+    </script>
+</body>
+</html>
