@@ -12,56 +12,61 @@
             padding-top: 5%;
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
         #result {
             margin-top: 20px;
             padding: 10px;
             border-radius: 5px;
+            word-wrap: break-word;
+        }
+
+        #result a {
+            color: #007bff;
+            text-decoration: none;
         }
 
         .progress {
-            height: 25px;
+            height: 30px;
         }
 
         .progress-bar {
+            background-color: #28a745;
             text-align: center;
-            line-height: 25px;
+            line-height: 30px;
+            color: #ffffff;
+            width: 0%;
+            transition: width 0.1s ease;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Upload File - incrustwerush.org</h1>
+    <div class="m-5">
+        <b class="text-center">Upload File - incrustwerush.org</b>
         <form id="uploadForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="file">File:</label>
                 <input type="file" class="form-control-file" id="file" name="file">
             </div>
-            <div class="form-group">
-                <label for="extension">Extension:</label>
-                <input type="text" class="form-control" id="extension" name="extension" placeholder="txt">
+            <div class="mt-3 mb-3">
+            	<p>Allowed file extensions: txt, lst, zip, jpg, png, gif, mp4, mp3, wav, pptx, docx, pdf, xls, xlsx, csv, html, css, js, php, java, c, cpp, h, hpp, py, rb, go, swift, kt, json, xml, sql, bat, sh, ini, md, tsv, log, msg, ppt, rtf, dat, key, db, apk, exe, dll, jar, tar, gz, tgz, 7z, deb</p>
+
             </div>
-            <button type="button" class="btn btn-primary" onclick="submitForm()">Upload</button>
+            <button type="button" class="btn btn-primary btn-block" onclick="submitForm()">Upload</button>
+            <div class="progress mt-3" style="display: none;">
+                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
         </form>
+
         <div id="result"></div>
-        <div class="progress" style="display:none;">
-            <div class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-        </div>
     </div>
 
     <script>
         function submitForm() {
             var fileInput = document.getElementById('file');
-            var extensionInput = document.getElementById('extension');
             var fileName = fileInput.value.split('\\').pop();
-            var extension = extensionInput.value.trim();
+            var extension = fileName.split('.').pop();
 
             if (!fileName || !extension) {
-                alert('Please fill in all fields.');
+                alert('Please select a file.');
                 return;
             }
 
@@ -69,19 +74,13 @@
             formData.append('file', fileInput.files[0]);
             formData.append('extension', extension);
 
-            var progress = document.querySelector('.progress');
             var progressBar = document.querySelector('.progress-bar');
+            var progressContainer = document.querySelector('.progress');
+            progressContainer.style.display = 'block';
 
             fetch('http://api.incrustwerush.org/nitipgit/' + extension, {
                 method: 'POST',
-                body: formData,
-                onprogress: function(event) {
-                    if (event.lengthComputable) {
-                        var percent = (event.loaded / event.total) * 100;
-                        progressBar.style.width = percent + '%';
-                        progressBar.textContent = percent.toFixed(2) + '%';
-                    }
-                }
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
@@ -93,8 +92,32 @@
             })
             .catch(error => {
                 document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            })
+            .finally(() => {
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressBar.innerHTML = '0%';
             });
+
+            var totalSize = fileInput.files[0].size;
+            var uploadedSize = 0;
+
+            var updateProgress = setInterval(() => {
+                if (uploadedSize >= totalSize) {
+                    clearInterval(updateProgress);
+                    return;
+                }
+
+                uploadedSize += 1024 * 1024;
+                if (uploadedSize > totalSize) {
+                    uploadedSize = totalSize;
+                }
+                var percent = Math.round((uploadedSize / totalSize) * 100);
+                progressBar.style.width = percent + '%';
+                progressBar.innerHTML = percent + '%';
+            }, 1000);
         }
     </script>
+
 </body>
 </html>
