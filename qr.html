@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Code Generator</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        #qr-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        canvas {
+            border: 1px solid #ffffff;
+        }
+        
+        input {
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ffffff;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>QR Code Generator</h1>
+    </header>
+    <main>
+        <div style="border: 1px solid white; padding: 10px; margin-bottom: 10px;">
+            <label for="qr-text">QR Text:</label>
+            <input type="text" id="qr-text" placeholder="Enter text for QR Code" /><br />
+
+            <label for="qr-below">Text Below QR:</label>
+            <input type="text" id="qr-below" placeholder="Text below QR Code" /><br />
+
+            <button onclick="generateQRCode()">Generate QR Code</button>
+        </div>
+
+        <div style="border: 1px solid white; padding: 10px; text-decoration: center;">
+            <div>
+                <span>
+                    Result
+                </span>
+            </div>
+            <div id="qr-container"></div>
+        </div>
+
+    </main>
+
+    <script>
+        function generateQRCode() {
+
+            const qrText = document.getElementById('qr-text').value;
+            const qrBelowText = document.getElementById('qr-below').value;
+            const qrContainer = document.getElementById('qr-container');
+
+            qrContainer.innerHTML = '';
+
+            if (qrText.trim() === '') {
+                alert('Please enter some text for the QR code.');
+                return;
+            }
+
+            const qr = new QRCode("qr-container", {
+                text: qrText,
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H,
+            });
+
+            const textElement = document.createElement('p');
+            textElement.textContent = qrBelowText;
+            textElement.style.color = '#ffffff';
+            textElement.style.fontFamily = 'monospace';
+            qrContainer.appendChild(textElement);
+
+            const canvas = document.getElementById('qr-container').querySelector('canvas');
+            const imageDataUrl = canvas.toDataURL('image/png');
+
+            const combinedCanvas = document.createElement('canvas');
+            const context = combinedCanvas.getContext('2d');
+            const padding = 2;
+            const textHeight = 20;
+            combinedCanvas.width = canvas.width + (padding * 2);
+            combinedCanvas.height = canvas.height + textHeight + (padding * 2);
+            context.fillStyle = '#ffffff';
+            context.fillRect(0, 0, combinedCanvas.width, combinedCanvas.height);
+            context.drawImage(canvas, padding, padding);
+            context.font = '15px monospace';
+            context.textAlign = 'center';
+            context.fillStyle = '#000000';
+            context.fillText(qrBelowText, combinedCanvas.width / 2, canvas.height + textHeight + padding);
+
+            const combinedImageDataUrl = combinedCanvas.toDataURL('image/png');
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = combinedImageDataUrl;
+            downloadLink.download = 'qrcode.png';
+            downloadLink.textContent = 'Download QR Code';
+            qrContainer.appendChild(downloadLink);
+        }
+    </script>
+</body>
+
+</html>
