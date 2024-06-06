@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,8 +26,7 @@
         }
         
         #qr-container {
-            text-align: center;
-            margin-bottom: 20px;
+            display: none;
         }
         
         canvas {
@@ -46,6 +46,7 @@
             border: none;
             cursor: pointer;
         }
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -59,9 +60,6 @@
             <label for="qr-text">QR Text:</label>
             <input type="text" id="qr-text" placeholder="Enter text for QR Code" /><br />
 
-            <label for="qr-below">Text Below QR:</label>
-            <input type="text" id="qr-below" placeholder="Text below QR Code" /><br />
-
             <button onclick="generateQRCode()">Generate QR Code</button>
         </div>
 
@@ -72,6 +70,7 @@
                 </span>
             </div>
             <div id="qr-container"></div>
+            <div id="link"></div>
         </div>
 
     </main>
@@ -80,7 +79,7 @@
         function generateQRCode() {
 
             const qrText = document.getElementById('qr-text').value;
-            const qrBelowText = document.getElementById('qr-below').value;
+            const qrBelowText = `incrustwerush.org`;
             const qrContainer = document.getElementById('qr-container');
 
             qrContainer.innerHTML = '';
@@ -92,32 +91,26 @@
 
             const qr = new QRCode("qr-container", {
                 text: qrText,
-                width: 128,
-                height: 128,
+                width: 512,
+                height: 512,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H,
             });
-
-            const textElement = document.createElement('p');
-            textElement.textContent = qrBelowText;
-            textElement.style.color = '#ffffff';
-            textElement.style.fontFamily = 'monospace';
-            qrContainer.appendChild(textElement);
 
             const canvas = document.getElementById('qr-container').querySelector('canvas');
             const imageDataUrl = canvas.toDataURL('image/png');
 
             const combinedCanvas = document.createElement('canvas');
             const context = combinedCanvas.getContext('2d');
-            const padding = 2;
-            const textHeight = 20;
+            const padding = 20;
+            const textHeight = 50;
             combinedCanvas.width = canvas.width + (padding * 2);
             combinedCanvas.height = canvas.height + textHeight + (padding * 2);
             context.fillStyle = '#ffffff';
             context.fillRect(0, 0, combinedCanvas.width, combinedCanvas.height);
             context.drawImage(canvas, padding, padding);
-            context.font = '15px monospace';
+            context.font = '50px monospace';
             context.textAlign = 'center';
             context.fillStyle = '#000000';
             context.fillText(qrBelowText, combinedCanvas.width / 2, canvas.height + textHeight + padding);
@@ -128,9 +121,15 @@
             downloadLink.href = combinedImageDataUrl;
             downloadLink.download = 'qrcode.png';
             downloadLink.textContent = 'Download QR Code';
-            qrContainer.appendChild(downloadLink);
+
+            const link = document.getElementById('link');
+
+            link.appendChild(downloadLink);
+            
+
         }
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vef91dfe02fce4ee0ad053f6de4f175db1715022073587" integrity="sha512-sDIX0kl85v1Cl5tu4WGLZCpH/dV9OHbA4YlKCuCiMmOQIk4buzoYDZSFj+TvC71mOBLh8CDC/REgE0GX0xcbjA==" data-cf-beacon='{"rayId":"88f93727599a6bd6","r":1,"version":"2024.4.1","token":"e9461ba5749d461881967076c6a33378"}' crossorigin="anonymous"></script>
 </body>
 
 </html>
