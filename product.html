@@ -66,13 +66,27 @@
                     const productElement = document.createElement('div');
 
                     productElement.innerHTML = `
-                        <h2>${data.name}</h2>
-                        <img src="${data.picture}" alt="Product Image" style="max-width: 100%;">
-                        <p>Art Code: ${data.art_code}</p>
-                        <p>Item Code: ${data.item_code}</p>
-                        <p>Made By: ${data.made_by}</p>
-                        <p>Price: ${data.price}</p>
-                        <p>Detail: ${data.detail}</p>
+                        <div style="margin-bottom: 10px;">
+                            <b>${data.name}</b>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <img src="${data.picture}" alt="Product Image" style="max-width: 100%;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <p>Art Code: ${data.art_code}</p>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <p>Item Code: ${data.item_code}</p>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <p>Made By: ${data.made_by}</p>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <p>Price: ${data.price}</p>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <p>Detail: ${data.detail}</p>
+                        </div>
                     `;
 
                     productContainer.appendChild(productElement);
