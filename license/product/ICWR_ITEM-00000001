@@ -1,9 +1,9 @@
 {
-    "art_code": "ICWR_ART-00000005",
+    "art_code": "ICWR_ART-00000001",
     "item_code": "ICWR_ITEM-00000001",
     "made_by": "incrustwerush.org",
-    "name": "T-Shirt Sanity V 1.0 - incrustwerush.org",
-    "picture": "https://incrustwerush.org/img/site/image.png",
-    "price": "100000",
-    "detail": "Size L"
+    "name": "RushOS GNU/Linux V 1.0 (Alpha) - LXDE",
+    "picture": "https://github.com/ICWR-TEAM/Storage/blob/main/random/RushOS.jpg?raw=true",
+    "price": "Free",
+    "detail": "RushOS"
 }
