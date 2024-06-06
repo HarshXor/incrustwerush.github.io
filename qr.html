@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QR Code Generator</title>
+    <title>incrustwerush.org - QR Code Product Generator</title>
 
     <style>
         body {
@@ -53,22 +52,14 @@
 
 <body>
     <header>
-        <h1>QR Code Generator</h1>
+        <h1>incrustwerush.org - QR Code Product Generator</h1>
     </header>
     <main>
-        <div style="border: 1px solid white; padding: 10px; margin-bottom: 10px;">
-            <label for="qr-text">QR Text:</label>
+        <div style="border: 1px solid white; padding: 10px; margin-bottom: 10px; text-align: center;">
+            <label for="qr-text">Code Product:</label>
             <input type="text" id="qr-text" placeholder="Enter text for QR Code" /><br />
 
-            <button onclick="generateQRCode()">Generate QR Code</button>
-        </div>
-
-        <div style="border: 1px solid white; padding: 10px; text-decoration: center;">
-            <div>
-                <span>
-                    Result
-                </span>
-            </div>
+            <button onclick="generateQRCode()">Generate</button>
             <div id="qr-container"></div>
             <div id="link"></div>
         </div>
@@ -118,12 +109,14 @@
             const combinedImageDataUrl = combinedCanvas.toDataURL('image/png');
 
             const downloadLink = document.createElement('a');
+            downloadLink.setAttribute("style", "color: white;")
             downloadLink.href = combinedImageDataUrl;
             downloadLink.download = 'qrcode.png';
             downloadLink.textContent = 'Download QR Code';
 
             const link = document.getElementById('link');
 
+            link.appendChild(document.createElement('hr'));
             link.appendChild(downloadLink);
             
 
