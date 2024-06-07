@@ -1,1 +1,9 @@
-ICWR_ITEM-00000001
+{
+    "art_code": "ICWR_ART-00000006",
+    "item_code": "ICWR_ITEM-00000002",
+    "made_by": "",
+    "name": "T-Shirt Sanity V 1.0 - incrustwerush.org",
+    "picture": "https://github.com/ICWR-TEAM/Storage/blob/main/random/RushOS.jpg?raw=true",
+    "price": "100000",
+    "detail": "Size L"
+}
