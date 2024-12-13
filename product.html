@@ -97,7 +97,6 @@
                     const searchFormContainer = document.getElementById('searchFormContainer');
                     const searchForm = document.createElement('form');
                     const searchInput = document.createElement('input');
-                    const searchSpace = document.createElement('br');
                     const searchButton = document.createElement('button');
 
                     searchForm.addEventListener('submit', function(event) {
@@ -112,11 +111,11 @@
                     searchInput.setAttribute('placeholder', 'Search Code Product...');
 
                     searchButton.setAttribute('type', 'submit');
-                    searchButton.setAttribute('class', 'btn btn-dark');
+                    searchButton.setAttribute('class', 'btn');
+                    searchButton.setAttribute('style', 'background-color: black; border: 1px solid white; color: white;');
                     searchButton.textContent = 'Search';
 
                     searchForm.appendChild(searchInput);
-                    searchForm.appencChild(searchSpace);
                     searchForm.appendChild(searchButton);
                     searchFormContainer.appendChild(searchForm);
                 }
