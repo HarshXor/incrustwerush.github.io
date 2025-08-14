@@ -180,7 +180,7 @@ trough of imagination. Half peaceful, half ironic, and half passionately dancing
             const json = await res.json();
             document.getElementById("newsModalLabel").innerText = json.data.title;
             document.getElementById("newsModalBody").innerHTML = `
-        <img src="${json.data.image_url}" style="width:100%; max-height:300px; object-fit:cover; margin-bottom:10px;">
+        <img src="${json.data.image_url}" style="width:100%; object-fit:cover; margin-bottom:10px;">
         <p style="font-size:12px;">${json.data.tags} | ${json.data.published_at}</p>
         <div>${json.data.content}</div>
     `;
