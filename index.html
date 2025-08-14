@@ -21,11 +21,24 @@
             color: white;
             text-decoration: none;
         }
-        
         .linktext:hover {
             background-color: white;
             color: black;
             text-decoration: none;
+        }
+        .card-body:hover {
+            background-color: white;
+            color: black;
+        }
+        .card-body, .card-body p, .card-body h5 {
+            overflow-wrap: break-word;
+            word-break: break-word;
+            overflow: hidden;
+            white-space: normal;
+        }
+        .break-word {
+            word-wrap: break-word;
+            /*word-break: break-all;*/
         }
     </style>
 </head>
@@ -64,7 +77,8 @@
         </div>
     </nav>
 
-    <header style="height: 100vh; min-height: 300px; background-color: black; background-image: url('img/site/bg.jpg'); background-size: cover;  background-attachment: fixed; background-position: center; background-repeat: no-repeat;">
+    <header style="height: 100vh; min-height: 300px; background-color: black; background-image: url('img/site/bg.jpg'); background-size: cover;  background-attachment: fixed; background-position: center; background-repeat: 
+no-repeat;">
         <div style="margin: 0 auto; height: 100%; background-color: rgba(0, 0, 0, 0.9);">
             <div class="container h-100">
                 <div class="row h-100 align-items-center">
@@ -79,7 +93,8 @@
                         </div>
                         <div class="mb-3">
                             <span style="font-size: 10px;">
-                                " The declination of sanity in the semi-black age that comes with a desire for praxis, along with the darkness creeping softly. Wielding a crowd of angry worshipers in the depths of the bottom of the trough of imagination. Half peaceful, half ironic, and half passionately dancing. "
+                                " The declination of sanity in the semi-black age that comes with a desire for praxis, along with the darkness creeping softly. Wielding a crowd of angry worshipers in the depths of the bottom of the 
+trough of imagination. Half peaceful, half ironic, and half passionately dancing. "
                             </span>
                         </div>
                         <div class="mb-3">
@@ -103,7 +118,7 @@
         <div id="pagination" class="mt-3 text-center"></div>
     </div>
 
-    <div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
+    <div class="modal fade break-word" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content" style="background-color: #111; color: white">
                 <div class="modal-header">
@@ -174,18 +189,6 @@
 
         loadNews();
     </script>
-    <style>
-        .card-body:hover {
-            background-color: white;
-            color: black;
-        }
-        .card-body, .card-body p, .card-body h5 {
-            overflow-wrap: break-word;
-            word-break: break-word;
-            overflow: hidden;
-            white-space: normal;
-        }
-    </style>
 
     <div id="about"></div>
 
@@ -196,7 +199,8 @@
                     <span style="font-weight: bold;">About Us</span>
                     <hr class="mb-3" />
                     <span>
-                        We are an organization that was founded on December 20, 2015. Our organization is not limited to a specific topic, but rather discusses various topics ranging from Cyber Security, Science, Technology, Sociology, outlook on life, and others.
+                        We are an organization that was founded on December 20, 2015. Our organization is not limited to a specific topic, but rather discusses various topics ranging from Cyber Security, Science, Technology, 
+Sociology, outlook on life, and others.
                     </span>
                     <hr class="mb-3" />
                 </div>
