@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Mic → Speaker Amplifier (Real-time)</title>
+<style>
+  :root{
+    --bg:#0b0f14;
+    --panel:#121821;
+    --panel-2:#0f151d;
+    --line:#1e2733;
+    --txt:#e7eef7;
+    --dim:#8a9bb0;
+    --green:#2ee6a8;
+    --amber:#ffc247;
+    --red:#ff5d5d;
+    --blue:#4aa8ff;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:radial-gradient(1200px 700px at 50% -10%,#16202c 0%,var(--bg) 60%);
+    color:var(--txt);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex;justify-content:center;padding:22px 16px 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{width:100%;max-width:680px}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  h1{font-size:19px;margin:0;letter-spacing:.2px;font-weight:650}
+  h1 span{color:var(--green)}
+  .pill{
+    margin-left:auto;font:12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+    padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--dim);display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:#3a4a5e;transition:.2s}
+  .pill.live{color:var(--green);border-color:#1d4a3c;background:#0e1f1a}
+  .pill.live .dot{background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s infinite}
+  .pill.muted{color:var(--red);border-color:#4a1d1d;background:#1f0e0e}
+  .pill.muted .dot{background:var(--red)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);
+        border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 18px 40px -28px #000}
+  .card h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
+           margin:0 0 12px;font-weight:600}
+
+  /* ---- meter ---- */
+  .meter{position:relative;height:26px;border-radius:8px;background:#080c11;border:1px solid var(--line);overflow:hidden}
+  .meter .fill{position:absolute;inset:0;width:0%;transform-origin:left;
+    background:linear-gradient(90deg,#1f7a5c 0%,var(--green) 55%,var(--amber) 82%,var(--red) 100%);
+    transition:width .045s linear;will-change:width}
+  .meter .peak{position:absolute;top:0;bottom:0;width:2px;background:#fff;opacity:.85;left:0;
+    transition:left .12s ease-out;box-shadow:0 0 8px #fff8}
+  .scale{display:flex;justify-content:space-between;font:10px/1 var(--mono);color:#55677d;margin-top:6px}
+  .dbread{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;font-family:var(--mono)}
+  .dbread b{font-size:22px;font-weight:600;letter-spacing:-.5px}
+  .dbread span{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+
+  /* ---- controls ---- */
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  button{
+    flex:1 1 150px;min-height:48px;border-radius:12px;border:1px solid var(--line);
+    background:#172231;color:var(--txt);font:600 14px/1 system-ui,sans-serif;cursor:pointer;
+    transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  button:hover:not(:disabled){border-color:#2c3d52;background:#1b2839}
+  button:active:not(:disabled){transform:translateY(1px)}
+  button:disabled{opacity:.38;cursor:not-allowed}
+  button.primary{background:linear-gradient(180deg,#1e7d5f,#146c50);border-color:#2a9d78;color:#eafff6}
+  button.primary:hover:not(:disabled){background:linear-gradient(180deg,#249070,#17795a)}
+  button.danger{background:#3a1414;border-color:#5e2323;color:#ffb4b4}
+  button.danger:hover:not(:disabled){background:#4a1919}
+  button.warn{background:#3a2a10;border-color:#5e4416;color:#ffd489}
+  kbd{font:11px var(--mono);background:#0c1219;border:1px solid var(--line);border-bottom-width:2px;
+      border-radius:5px;padding:2px 5px;color:var(--dim)}
+
+  .field{margin-top:16px}
+  .field .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .field label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:600}
+  .field output{font:600 13px var(--mono);color:var(--green)}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:34px;background:transparent;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;
+    background:linear-gradient(90deg,#1c2836,#26394e);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-9px;
+    border-radius:50%;background:radial-gradient(circle at 35% 30%,#7df3c9,var(--green));
+    border:2px solid #0b0f14;box-shadow:0 0 12px #2ee6a877}
+  input[type=range]::-moz-range-track{height:8px;border-radius:99px;background:#1c2836;border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;border:2px solid #0b0f14;
+    background:var(--green);box-shadow:0 0 12px #2ee6a877}
+
+  .toggles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .tg{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);
+      border-radius:11px;background:#0d141c;cursor:pointer;user-select:none;font-size:13px;color:var(--dim)}
+  .tg input{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:99px;
+    background:#22303f;position:relative;transition:.18s;cursor:pointer;flex:0 0 auto;margin:0}
+  .tg input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+    background:#7b8ea3;transition:.18s}
+  .tg input:checked{background:#155c46}
+  .tg input:checked::after{left:19px;background:var(--green);box-shadow:0 0 8px #2ee6a8}
+  .tg.on{color:var(--txt);border-color:#22384a}
+
+  select{
+    width:100%;min-height:44px;border-radius:11px;border:1px solid var(--line);background:#0d141c;
+    color:var(--txt);padding:0 12px;font:14px system-ui;cursor:pointer
+  }
+
+  /* ---- stats ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .stat{background:#0d141c;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+  .stat i{display:block;font:10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+          color:#5f7188;margin-bottom:6px;font-style:normal}
+  .stat b{font:600 15px var(--mono);color:var(--txt);word-break:break-word}
+
+  .note{font-size:12.5px;color:var(--dim);line-height:1.6;margin:0}
+  .note b{color:var(--amber);font-weight:600}
+  .note code{font:12px var(--mono);background:#0a1017;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+
+  #toast{
+    position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+    background:#2a1113;border:1px solid #5e2323;color:#ffc9c9;padding:12px 18px;border-radius:12px;
+    font-size:13.5px;max-width:min(92vw,520px);text-align:center;transition:.25s;z-index:50;
+    box-shadow:0 20px 50px -20px #000
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+  @media (max-width:430px){ .toggles{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>Mic <span>→</span> Speaker Amplifier</h1>
+    <div class="pill" id="statusPill"><span class="dot"></span><span id="statusText">mati</span></div>
+  </header>
+
+  <!-- LEVEL -->
+  <section class="card">
+    <h2>Level Input</h2>
+    <div class="meter">
+      <div class="fill" id="meterFill"></div>
+      <div class="peak" id="meterPeak"></div>
+    </div>
+    <div class="scale"><span>-60</span><span>-40</span><span>-20</span><span>-12</span><span>-6</span><span>0 dB</span></div>
+    <div class="dbread">
+      <span>Peak</span>
+      <b id="dbValue">−∞ dB</b>
+    </div>
+  </section>
+
+  <!-- KONTROL -->
+  <section class="card">
+    <h2>Kontrol</h2>
+    <div class="row">
+      <button id="btnStart" class="primary">▶ Mulai</button>
+      <button id="btnStop" disabled>■ Stop</button>
+      <button id="btnMute" class="warn" disabled>Mute <kbd>Space</kbd></button>
+    </div>
+
+    <div class="field">
+      <div class="top">
+        <label for="gain">Penguatan (Gain)</label>
+        <output id="gainOut">0.0 dB</output>
+      </div>
+      <input id="gain" type="range" min="-24" max="30" step="0.5" value="0" />
+    </div>
+
+    <div class="field">
+      <div class="top">
+        <label for="latency">Mode Latency</label>
+        <output id="latOut">interactive</output>
+      </div>
+      <select id="latency">
+        <option value="interactive" selected>interactive — paling rendah (~5–20 ms)</option>
+        <option value="balanced">balanced — sedang (~30–60 ms)</option>
+        <option value="playback">playback — stabil (~80–200 ms)</option>
+      </select>
+    </div>
+
+    <div class="toggles">
+      <label class="tg on" id="tgLimiter"><input type="checkbox" id="limiter" checked> Limiter (anti-clip)</label>
+      <label class="tg on" id="tgGuard"><input type="checkbox" id="guard" checked> Auto-mute saat feedback</label>
+    </div>
+  </section>
+
+  <!-- STATISTIK -->
+  <section class="card">
+    <h2>Status Audio</h2>
+    <div class="stats">
+      <div class="stat"><i>Sample Rate</i><b id="sRate">—</b></div>
+      <div class="stat"><i>Base Latency</i><b id="sBase">—</b></div>
+      <div class="stat"><i>Output Latency</i><b id="sOut">—</b></div>
+      <div class="stat"><i>Total (in+out)</i><b id="sTotal">—</b></div>
+      <div class="stat"><i>Input Device</i><b id="sDev">—</b></div>
+      <div class="stat"><i>Echo Cancel / NS / AGC</i><b id="sDsp">—</b></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <p class="note">
+      <b>⚠ Pakai headphone / IEM.</b> Mic langsung ke speaker = loop akustik → feedback (bunyi melengking).
+      Tombol <b>Mute</b> (atau <kbd>Space</kbd>) untuk memutus seketika.
+      Rantai sinyal dibuat seminimal mungkin (<code>mic → gain → limiter → out</code>) tanpa buffer tambahan,
+      jadi delay mendekati batas hardware.
+    </p>
+  </section>
+
+</div>
+<div id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  const ui = {
+    pill: $('statusPill'), pillText: $('statusText'),
+    btnStart: $('btnStart'), btnStop: $('btnStop'), btnMute: $('btnMute'),
+    gain: $('gain'), gainOut: $('gainOut'),
+    latency: $('latency'), latOut: $('latOut'),
+    limiter: $('limiter'), guard: $('guard'),
+    tgLimiter: $('tgLimiter'), tgGuard: $('tgGuard'),
+    fill: $('meterFill'), peak: $('meterPeak'), db: $('dbValue'),
+    sRate: $('sRate'), sBase: $('sBase'), sOut: $('sOut'), sTotal: $('sTotal'),
+    sDev: $('sDev'), sDsp: $('sDsp'), toast: $('toast'),
+  };
+
+  const S = {
+    ctx: null, stream: null, src: null,
+    gain: null, limiter: null, analyser: null, mute: null,
+    buf: null, raf: 0, running: false, muted: false,
+    peakHold: 0, peakDb: -Infinity, guardStart: 0,
+  };
+
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const dbToGain = (db) => Math.pow(10, db / 20);
+  const fmtMs = (s) => (typeof s === 'number' && isFinite(s)) ? (s * 1000).toFixed(1) + ' ms' : '—';
+
+  let toastTimer = 0;
+  function toast(msg, ms = 3800) {
+    ui.toast.textContent = msg;
+    ui.toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => ui.toast.classList.remove('show'), ms);
+  }
+
+  function setStatus(kind, text) {
+    ui.pill.classList.remove('live', 'muted');
+    if (kind) ui.pill.classList.add(kind);
+    ui.pillText.textContent = text;
+  }
+
+  /* ---------- wiring ---------- */
+  // Rantai: src -> gain -> [limiter] -> analyser -> mute -> destination
+  function rewire() {
+    if (!S.ctx) return;
+    const { src, gain, limiter, analyser, mute, ctx } = S;
+    [src, gain, limiter, analyser, mute].forEach(n => { try { n.disconnect(); } catch (_) {} });
+
+    src.connect(gain);
+    if (ui.limiter.checked) {
+      gain.connect(limiter);
+      limiter.connect(analyser);
+    } else {
+      gain.connect(analyser);
+    }
+    analyser.connect(mute);
+    mute.connect(ctx.destination);
+  }
+
+  function applyGain() {
+    const db = parseFloat(ui.gain.value) || 0;
+    ui.gainOut.textContent = (db > 0 ? '+' : '') + db.toFixed(1) + ' dB';
+    if (S.gain) {
+      S.gain.gain.setTargetAtTime(dbToGain(db), S.ctx.currentTime, 0.01);
+    }
+  }
+
+  function setMuted(m) {
+    S.muted = m;
+    if (S.mute) S.mute.gain.setTargetAtTime(m ? 0 : 1, S.ctx.currentTime, 0.005);
+    ui.btnMute.textContent = m ? '🔇 Unmute (Space)' : 'Mute (Space)';
+    ui.btnMute.classList.toggle('warn', !m);
+    ui.btnMute.classList.toggle('danger', m);
+    setStatus(m ? 'muted' : 'live', m ? 'muted' : 'live');
+  }
+
+  function updateStats() {
+    const c = S.ctx;
+    if (!c) return;
+    ui.sRate.textContent = c.sampleRate.toLocaleString('en-US') + ' Hz';
+    ui.sBase.textContent = fmtMs(c.baseLatency);
+    ui.sOut.textContent = fmtMs(c.outputLatency);
+    const total = (c.baseLatency || 0) + (c.outputLatency || 0);
+    ui.sTotal.textContent = total ? fmtMs(total) : '—';
+
+    const st = S.stream && S.stream.getAudioTracks()[0];
+    if (st) {
+      const s = st.getSettings ? st.getSettings() : {};
+      ui.sDev.textContent = st.label || 'Default microphone';
+      const parts = [];
+      parts.push('EC:' + (s.echoCancellation ? 'on' : 'off'));
+      parts.push('NS:' + (s.noiseSuppression ? 'on' : 'off'));
+      parts.push('AGC:' + (s.autoGainControl ? 'on' : 'off'));
+      ui.sDsp.textContent = parts.join(' · ');
+    }
+  }
+
+  /* ---------- meter loop ---------- */
+  function loop() {
+    S.raf = requestAnimationFrame(loop);
+    const an = S.analyser;
+    if (!an) return;
+
+    if (!S.buf || S.buf.length !== an.fftSize) S.buf = new Float32Array(an.fftSize);
+    an.getFloatTimeDomainData(S.buf);
+
+    let peak = 0, sum = 0;
+    const b = S.buf;
+    for (let i = 0; i < b.length; i++) {
+      const v = b[i];
+      const a = v < 0 ? -v : v;
+      if (a > peak) peak = a;
+      sum += v * v;
+    }
+    const rms = Math.sqrt(sum / b.length);
+    const db = 20 * Math.log10(peak || 1e-8);
+    S.peakDb = db;
+
+    const pct = clamp((db + 60) / 60 * 100, 0, 100);
+    ui.fill.style.width = pct.toFixed(2) + '%';
+
+    // peak-hold (turun perlahan)
+    S.peakHold = Math.max(pct, S.peakHold - 0.55);
+    ui.peak.style.left = clamp(S.peakHold, 0, 99.6).toFixed(2) + '%';
+
+    ui.db.textContent = (peak < 1e-4 ? '−∞' : (db > 0 ? '+' : '') + db.toFixed(1)) + ' dB';
+    ui.db.style.color = db > -3 ? 'var(--red)' : db > -12 ? 'var(--amber)' : 'var(--txt)';
+
+    // guard anti-feedback
+    if (ui.guard.checked && !S.muted && S.running) {
+      const hot = peak > 0.7;                       // > ~ -3 dBFS
+      const now = performance.now();
+      if (hot) {
+        if (!S.guardStart) S.guardStart = now;
+        else if (now - S.guardStart > 1500) {
+          setMuted(true);
+          S.guardStart = 0;
+          toast('Feedback terdeteksi (level > −3 dBFS 1,5 s). Output otomatis di-mute. Pakai headphone ya.');
+        }
+      } else {
+        S.guardStart = 0;
+      }
+    }
+
+    if (rms < 0) return; // noop, jaga optimasi
+  }
+
+  /* ---------- start / stop ---------- */
+  async function start() {
+    if (S.running) return;
+    ui.btnStart.disabled = true;
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      ui.btnStart.disabled = false;
+      return toast('Browser ini tidak mendukung getUserMedia. Pakai Chrome/Edge/Firefox/Safari terbaru, dan buka lewat http://localhost atau https:// (bukan file:// di Safari).');
+    }
+
+    // PENTING (iOS Safari): AudioContext harus dibuat & di-resume di dalam gesture user,
+    // jadi dibuat SEBELUM await apa pun.
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AC({ latencyHint: ui.latency.value });
+    try { if (ctx.state !== 'running') await ctx.resume(); } catch (_) {}
+
+    try {
+      // Matikan semua pemrosesan otomatis -> latency paling kecil & suara apa adanya
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 1,
+        },
+        video: false,
+      });
+
+      S.stream = stream;
+      S.ctx = ctx;
+      S.src = ctx.createMediaStreamSource(stream);
+
+      S.gain = ctx.createGain();
+      S.gain.gain.value = dbToGain(parseFloat(ui.gain.value) || 0);
+
+      // Limiter: cegah clipping saat gain dinaikkan
+      S.limiter = ctx.createDynamicsCompressor();
+      S.limiter.threshold.value = -3;
+      S.limiter.knee.value = 0;
+      S.limiter.ratio.value = 20;
+      S.limiter.attack.value = 0.003;
+      S.limiter.release.value = 0.15;
+
+      S.analyser = ctx.createAnalyser();
+      S.analyser.fftSize = 1024;
+      S.analyser.smoothingTimeConstant = 0.25;
+
+      S.mute = ctx.createGain();
+      S.mute.gain.value = S.muted ? 0 : 1;
+
+      rewire();
+
+      // track berhenti (device dicabut / izin dicabut)
+      const track = stream.getAudioTracks()[0];
+      if (track) {
+        track.addEventListener('ended', () => {
+          toast('Input audio terputus.');
+          stop();
+        });
+      }
+
+      S.running = true;
+      S.peakHold = 0;
+      S.guardStart = 0;
+      ui.btnStart.disabled = true;
+      ui.btnStop.disabled = false;
+      ui.btnMute.disabled = false;
+      setMuted(S.muted);
+      updateStats();
+
+      cancelAnimationFrame(S.raf);
+      loop();
+
+      const ms = ((ctx.baseLatency || 0) + (ctx.outputLatency || 0)) * 1000;
+      toast('Live. Perkiraan delay total ≈ ' + (ms ? ms.toFixed(0) + ' ms' : 'beberapa ms') + '. Gunakan headphone untuk hindari feedback.', 5000);
+    } catch (err) {
+      try { if (ctx.state !== 'closed') await ctx.close(); } catch (_) {}
+      ui.btnStart.disabled = false;
+      const name = err && err.name;
+      let msg = 'Gagal mengakses mikrofon: ' + (err && err.message || err);
+      if (name === 'NotAllowedError' || name === 'SecurityError')
+        msg = 'Izin mikrofon ditolak. Klik ikon 🔒 di address bar → izinkan Microphone, lalu muat ulang halaman.';
+      else if (name === 'NotFoundError' || name === 'OverconstrainedError')
+        msg = 'Tidak ada mikrofon yang terdeteksi. Sambungkan mic lalu coba lagi.';
+      else if (name === 'NotReadableError')
+        msg = 'Mikrofon sedang dipakai aplikasi lain (Zoom/OBS/Discord). Tutup aplikasi itu lalu coba lagi.';
+      toast(msg, 7000);
+    }
+  }
+
+  function stop() {
+    S.running = false;
+    cancelAnimationFrame(S.raf);
+    S.raf = 0;
+
+    if (S.stream) S.stream.getTracks().forEach(t => { try { t.stop(); } catch (_) {} });
+    if (S.ctx && S.ctx.state !== 'closed') { S.ctx.close().catch(() => {}); }
+
+    S.stream = S.ctx = S.src = S.gain = S.limiter = S.analyser = S.mute = null;
+    S.buf = null;
+    S.peakHold = 0;
+    S.guardStart = 0;
+
+    ui.fill.style.width = '0%';
+    ui.peak.style.left = '0%';
+    ui.db.textContent = '−∞ dB';
+    ui.db.style.color = 'var(--txt)';
+    ui.btnStart.disabled = false;
+    ui.btnStop.disabled = true;
+    ui.btnMute.disabled = true;
+    ui.btnMute.textContent = 'Mute (Space)';
+    ui.btnMute.classList.add('warn');
+    ui.btnMute.classList.remove('danger');
+    setStatus('', 'mati');
+    ['sRate','sBase','sOut','sTotal','sDev','sDsp'].forEach(k => ui[k].textContent = '—');
+  }
+
+  /* ---------- events ---------- */
+  ui.btnStart.addEventListener('click', start);
+  ui.btnStop.addEventListener('click', stop);
+  ui.btnMute.addEventListener('click', () => { if (S.running) setMuted(!S.muted); });
+
+  ui.gain.addEventListener('input', applyGain);
+
+  ui.limiter.addEventListener('change', () => {
+    ui.tgLimiter.classList.toggle('on', ui.limiter.checked);
+    if (S.running) rewire();
+  });
+  ui.guard.addEventListener('change', () => {
+    ui.tgGuard.classList.toggle('on', ui.guard.checked);
+  });
+
+  ui.latency.addEventListener('change', () => {
+    ui.latOut.textContent = ui.latency.value;
+    if (S.running) {
+      toast('Mode latency baru berlaku setelah Stop → Mulai (AudioContext perlu dibuat ulang).', 5000);
+    }
+  });
+
+  // Space = panic mute (jangan ganggu saat fokus di input/select)
+  document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
+    e.preventDefault();
+    if (S.running) setMuted(!S.muted);
+  });
+
+  // tab disembunyikan -> tetap jalan, tapi bila halaman ditutup bersihkan
+  window.addEventListener('pagehide', stop);
+  document.addEventListener('visibilitychange', () => { if (document.hidden && S.ctx) S.ctx.resume?.(); });
+
+  applyGain();
+  ui.latOut.textContent = ui.latency.value;
+})();
+</script>
+</body>
+</html>
